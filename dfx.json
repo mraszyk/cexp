@@ -1,0 +1,28 @@
+{
+  "canisters": {
+    "cexp": {
+      "frontend": {
+        "entrypoint": "src/cexp/src/index.html"
+      },
+      "source": [
+        "src/cexp/assets",
+        "dist/cexp"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "dfx": "0.10.0",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}
