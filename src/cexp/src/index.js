@@ -7,6 +7,16 @@ function buf2hex(buffer) {
     .join('');
 }
 
+function uleb128(buffer) {
+  var r=0;
+  var b=1;
+  for (var i = 0; i < buffer.length; i++) {
+    r+=(buffer[i]&127)*b;
+    b*=128;
+  }
+  return r;
+}
+
 document.querySelector("form").addEventListener("submit", async (e) => {
 
   e.preventDefault();
@@ -24,6 +34,7 @@ document.querySelector("form").addEventListener("submit", async (e) => {
   var certificate = new Certificate(response, agent);
   var valid = await certificate.verify();
   var hash = certificate.lookup(["canister", principal.toUint8Array(), "module_hash"]);
+  var time = certificate.lookup(["time"]);
   var controllers = cbor.decode(certificate.lookup(["canister", principal.toUint8Array(), "controllers"])).value;
 
   document.getElementById("valid").innerText = "valid: " + valid;
@@ -31,6 +42,12 @@ document.querySelector("form").addEventListener("submit", async (e) => {
   document.getElementById("controllers").innerText = "controllers: " + controllers.map(function(o){
     return Principal.fromUint8Array(o).toText();
   });
+  var timebuffer = new Uint8Array(time);
+  var r=uleb128(timebuffer)*1e-6;
+  var cdate = new Date(r);
+  var ldate = new Date();
+  document.getElementById("ctime").innerText = "certified time: " + cdate.toLocaleString();
+  document.getElementById("ltime").innerText = "client time: " + ldate.toLocaleString();
 
   try {
     var response_blob = await agent.readState(principal, {paths: [["canister", principal.toUint8Array(), "metadata", "repro"]]});
